@@ -5,10 +5,9 @@ import matplotlib.pyplot as plt
 df = pd.read_csv("international-visitors-london.csv")
 
 # 1 Identifying top 10 origin markets by total visitors (all years)
-
 top_markets = df.groupby(['market'])['visits'].sum().sort_values(ascending=False).head(10)
 
-print(f'These are the top 10 origin markets by total visitors across all years: {top_markets}')
+print(f'These are the top 10 origin markets by total visitors across all years: \n{top_markets}')
 
 # 2 Calculating yearly visitors per country each year
 yearly_visitors_df = df[df['market'].isin(top_markets.index)]
@@ -41,7 +40,7 @@ exceeded_markets = markets_ae[markets_ae].index.tolist()
 
 print(f'Count of markets exceeding 1 million: {count_emarkets}')
 print(f'Markets exceeding 1 million: {exceeded_markets}')
-
+print(' ')
 # 3 Calculate CAGR
 first_value = yearly_visitors_pv.loc[yearly_visitors_min]
 end_value = yearly_visitors_pv.loc[yearly_visitors_max]
@@ -49,15 +48,24 @@ number_years = yearly_visitors_max - yearly_visitors_min
 
 CAGR = ((end_value / first_value) ** (1 / number_years) - 1) * 100
 
-print(f'This is a list of the top 10 countries CAGR: {CAGR}')
+print(f'This is a list of the top 10 countries CAGR: \n{CAGR}')
 print(f'This is the country with the highest CAGR: {CAGR.idxmax()}')
+print(" ")
 
 # 4 Stay duration and purposes
 visit_purpope = df.groupby(['dur_stay', 'purpose'])['purpose'].count().reset_index(name='count')
 
-visit_purpope_pv = visit_purpope.pivot(index='dur_stay', columns='purpose', values='count')
-
-print(visit_purpope)
+visit_purpope_pv = visit_purpope.pivot(index='purpose', columns='dur_stay', values='count')
 
 # 4.1 Visualising the visit / purpose data
+visit_purpope_pv.plot(kind='bar', figsize=(12, 6), title='Stay duration by visit purpose')
+plt.xlabel('Purpose')
+plt.ylabel('Stay duration count')
+plt.legend(title='Stay duration')
+plt.xticks(rotation=0)
+plt.show()
+
+# 4.2 Identifying most common duration vor holiday visits
+max_dur_holiday_visits = visit_purpope_pv.loc['Holiday'].idxmax()
+print(f'The most common duration for holiday visits is: {max_dur_holiday_visits}')
 
